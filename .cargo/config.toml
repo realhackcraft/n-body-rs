@@ -1,0 +1,56 @@
+# Optimize compiliation with faster codegen for our code, but keeps llvm for packages.
+# NOTE: Cranelift is fast but results in slower binaries. We only use it for dev and not build.
+#
+# run `rustup component add rustc-codegen-cranelift-preview --toolchain nightly`
+# to install
+
+# Comment llvm/cranelift options when profiling. The profiler doesn't like it.
+[unstable]
+codegen-backend = true
+
+[profile.dev]
+codegen-backend = "cranelift"
+
+[profile.dev.package."*"]
+codegen-backend = "llvm"
+
+# NOTE: For maximum performance, build using a nightly compiler
+# If you are using rust stable, remove the "-Zshare-generics=y" below.
+
+[target.x86_64-unknown-linux-gnu]
+linker = "clang"
+rustflags = [
+    "-Clink-arg=-fuse-ld=lld", # Use LLD Linker
+    "-Zshare-generics=y",      # (Nightly) Make the current crate share its generic instantiations
+    "-Zthreads=0",             # (Nightly) Use improved multithreading with the recommended amount of threads.
+]
+
+[target.x86_64-apple-darwin]
+rustflags = [
+    "-Zshare-generics=y", # (Nightly) Make the current crate share its generic instantiations
+    "-Zthreads=0",        # (Nightly) Use improved multithreading with the recommended amount of threads.
+]
+
+[target.aarch64-apple-darwin]
+rustflags = [
+    "-Zshare-generics=y", # (Nightly) Make the current crate share its generic instantiations
+    "-Zthreads=0",        # (Nightly) Use improved multithreading with the recommended amount of threads.
+]
+
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe" # Use LLD Linker
+rustflags = [
+    "-Zshare-generics=n",
+    "-Zthreads=0",        # (Nightly) Use improved multithreading with the recommended amount of threads.
+]
+
+[target.x86_64-pc-windows-gnu]
+rustflags = [
+    "-Zshare-generics=y", # (Nightly) Make the current crate share its generic instantiations
+    "-Zthreads=0",        # (Nightly) Use improved multithreading with the recommended amount of threads.
+]
+
+# Optional: Uncommenting the following improves compile times, but reduces the amount of debug info to 'line number tables only'
+# In most cases the gains are negligible, but if you are on macos and have slow compile times you should see significant gains.
+# [profile.dev]
+# debug = 1

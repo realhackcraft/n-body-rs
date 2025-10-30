@@ -1,0 +1,60 @@
+[package]
+name = "blob-shooter"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+webgl2 = []
+default = ["debug_inspector"]
+embed_assets = ["dep:bevy_embedded_assets"]
+debug_inspector = ["dep:bevy-inspector-egui", "bevy/dynamic_linking"]
+cross_windows = ["dep:blake3"]
+
+[dependencies]
+bevy = { version = "0.16", features = ["wav"] }
+bevy-inspector-egui = { version = "0.33", optional = true }
+bevy_embedded_assets = { version = "0.13", optional = true }
+bevy_hanabi = "0.16"
+log = { version = "*", features = [
+    "max_level_debug",
+    "release_max_level_warn",
+] }
+rand = "0.9"
+
+# For windows
+[target.x86_64-pc-windows-msvc.dependencies]
+# Use pure rust implementation of blake3 for cross-compilation, as blake3 assumes
+# windows environment and tries to run EXE during compilation, which can fail
+# during cross-compilation.
+blake3 = { version = "1.8", features = ["pure"], optional = true }
+
+# Enable a small amount of optimization in the dev profile.
+[profile.dev]
+opt-level = 1
+
+# Enable a large amount of optimization in the dev profile for dependencies.
+[profile.dev.package."*"]
+opt-level = 3
+
+# Enable more optimization in the release profile at the cost of compile time.
+[profile.release]
+opt-level = 3
+# Compile the entire crate as one unit.
+# Slows compile times, marginal improvements.
+codegen-units = 1
+# Do a second optimization pass over the entire program, including dependencies.
+# Slows compile times, marginal improvements.
+lto = "thin"
+# NOTE: Use fat when releasing, but thin is also fine for profiling
+
+# lto = "fat"
+
+# Optimize for size in the wasm-release profile to reduce load times and bandwidth usage on web.
+[profile.wasm-release]
+# Default to release profile values.
+inherits = "release"
+# Optimize with size in mind (also try "z", sometimes it is better).
+# Slightly slows compile times, great improvements to file size and runtime performance.
+opt-level = "s"
+# Strip all debugging information from the binary to slightly reduce file size.
+strip = "debuginfo"
