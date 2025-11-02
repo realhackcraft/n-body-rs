@@ -152,7 +152,7 @@ fn spawn_object(
         let color = Color::oklch(0.7, 0.159, rng.random_range(0.0..360.));
         let color_material = materials.add(color);
 
-        let mass = 4.;
+        let mass = rng.random_range(2.0..50.);
         let density = 2.;
 
         let position = cursor.single().unwrap().0;
