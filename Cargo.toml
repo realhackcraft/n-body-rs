@@ -11,10 +11,10 @@ debug_inspector = ["dep:bevy-inspector-egui", "bevy/dynamic_linking"]
 cross_windows = ["dep:blake3"]
 
 [dependencies]
-bevy = { version = "0.16", features = ["wav"] }
-bevy-inspector-egui = { version = "0.33", optional = true }
-bevy_embedded_assets = { version = "0.13", optional = true }
-bevy_hanabi = "0.16"
+bevy = { version = "0.17", features = ["wav"] }
+bevy-inspector-egui = { version = "0.35", optional = true }
+bevy_embedded_assets = { version = "0.14", optional = true }
+bevy_hanabi = "0.17"
 log = { version = "*", features = [
     "max_level_debug",
     "release_max_level_warn",
